@@ -69,20 +69,24 @@ class Cinstant
             'sup'
         );
         
-        if($parent->hasChildNodes()){
-            $parentChildLength = $parent->childNodes->length;
-            
-            for($i=0; $i<$parentChildLength; $i++){
-                $maybe_caption = $parent->childNodes->item($i);
+        if($parent->tagName == 'body'){
+            $replaceParent = false;
+        }else{
+            if($parent->hasChildNodes()){
+                $parentChildLength = $parent->childNodes->length;
                 
-                if(in_array($maybe_caption->nodeName, $inline_tags))
-                    $figcaption_text[] = $maybe_caption;
-                elseif($maybe_caption->nodeName == $element->nodeName){
-                    continue;
+                for($i=0; $i<$parentChildLength; $i++){
+                    $maybe_caption = $parent->childNodes->item($i);
                     
-                }else{
-                    $replaceParent = false;
-                    break;
+                    if(in_array($maybe_caption->nodeName, $inline_tags))
+                        $figcaption_text[] = $maybe_caption;
+                    elseif($maybe_caption->nodeName == $element->nodeName){
+                        continue;
+                        
+                    }else{
+                        $replaceParent = false;
+                        break;
+                    }
                 }
             }
         }
@@ -95,6 +99,7 @@ class Cinstant
                     $figcaption->appendChild($el);
                 $figure->appendChild($figcaption);
             }
+            
             $parent->parentNode->replaceChild($figure, $parent);
         }else{
             $parent->insertBefore($figure, $element);
@@ -136,12 +141,12 @@ class Cinstant
      * @return $this
      */
     private function _convertIframe(){
-        $imgs = $this->doc->getElementsByTagName('iframe');
-        if(!$imgs->length)
+        $iframes = $this->doc->getElementsByTagName('iframe');
+        if(!$iframes->length)
             return $this;
         
-        for($i=0; $i<$imgs->length; $i++){
-            $iframe = $imgs->item($i);
+        for($i=0; $i<$iframes->length; $i++){
+            $iframe = $iframes->item($i);
             $parentClass = 'op-interactive';
             
             // make the image to be absolute url
@@ -155,6 +160,39 @@ class Cinstant
             
             // convert parent to figure
             $this->_convertElParent($iframe, $parentClass);
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Convert div tag 
+     * @return $this
+     */
+    private function _convertDiv(){
+        $divs = $this->doc->getElementsByTagName('div');
+        if(!$divs->length)
+            return $this;
+        
+        for($i=0; $i<$divs->length; $i++){
+            $div = $divs->item($i);
+            
+            // convert parent to figure
+            if($div->getAttribute('class') == 'fb-video'){
+                $iframe = $this->doc->createElement('iframe');
+                $div->parentNode->insertBefore($iframe, $div);
+                
+                // we also need to append fb script code
+                $iframe->appendChild($div);
+                
+                $script = $this->doc->createElement('script');
+                $scriptValue = $this->doc->createTextNode('(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));');
+                $script->appendChild($scriptValue);
+                
+                $iframe->appendChild($script);
+                
+                $this->_convertElParent($iframe, 'op-social');
+            }
         }
         
         return $this;
@@ -180,11 +218,17 @@ class Cinstant
         
         $this
             ->_convertImg()
-            ->_convertIframe();
+            ->_convertIframe()
+            ->_convertDiv();
         
         $cimp = $this->doc->saveHTML();
         preg_match('!^.+<body>(.+)</body>.+$!s', $cimp, $m);
         $this->article = $m[1];
+        
+        // clean empty html
+        $noempty_tags = ['p'];
+        foreach($noempty_tags as $tag)
+            $this->article = preg_replace('!<' . $tag . '> *<\/' . $tag . '>!', '', $this->article);
         
         return $this;
     }

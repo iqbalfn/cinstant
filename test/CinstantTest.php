@@ -48,7 +48,7 @@ class CinstantTest extends PHPUnit_Framework_TestCase
     }
     
     /**************************************************************************
-     * Interactive
+     * Interactive | social
      **************************************************************************/
      
      public function iframeProvider(){
@@ -90,6 +90,59 @@ class CinstantTest extends PHPUnit_Framework_TestCase
       * @group iframe
       */
     public function testIframe($html, $result, $options=array()){
+        $cins = new Cinstant($html, $options);
+        $this->assertEquals($result, $cins->article);
+    }
+    
+    /**************************************************************************
+     * social
+     **************************************************************************/
+     
+     public function divProvider(){
+        return array(
+            'make fb video to be op-social' => array(
+                'lorem <div data-href="https://www.facebook.com/shanghaiist/videos/10154488047006030/" data-width="670" data-show-text="false" class="fb-video" data-allowfullscreen="true"></div> ipsum',
+                'lorem <figure class="op-social"><iframe><div data-href="https://www.facebook.com/shanghaiist/videos/10154488047006030/" data-width="670" data-show-text="false" class="fb-video" data-allowfullscreen="true"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script></iframe></figure> ipsum',
+                array('localHost' => 'http://localhost')
+            )
+        );
+     }
+     
+     /**
+      * @dataProvider divProvider
+      * @group div
+      */
+    public function testDiv($html, $result, $options=array()){
+        $cins = new Cinstant($html, $options);
+        $this->assertEquals($result, $cins->article);
+    }
+    
+    /**************************************************************************
+     * empty tag
+     **************************************************************************/
+     
+     public function emptyProvider(){
+        return array(
+            'remove empty p tag' => array(
+                'lorem <p></p> ipsum',
+                'lorem  ipsum'
+            ),
+            'remove empty p tag with inner space' => array(
+                'lorem <p> </p> ipsum',
+                'lorem  ipsum'
+            ),
+            'remove empty p tag with inner spaces' => array(
+                'lorem <p>  </p> ipsum',
+                'lorem  ipsum'
+            )
+        );
+     }
+     
+     /**
+      * @dataProvider emptyProvider
+      * @group div
+      */
+    public function testEmpty($html, $result, $options=array()){
         $cins = new Cinstant($html, $options);
         $this->assertEquals($result, $cins->article);
     }
