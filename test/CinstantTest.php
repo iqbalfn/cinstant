@@ -15,6 +15,11 @@ class CinstantTest extends PHPUnit_Framework_TestCase
                 'lorem <figure><img src="http://localhost/media/image/1.png"></figure> ipsum',
                 array('localHost' => 'http://localhost')
             ),
+            'not fill hostname to relative image protocol' => array(
+                'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
+                'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
             'convert parent to figure' => array(
                 'lorem <p><img src="http://localhost"></p> ipsum',
                 'lorem <figure><img src="http://localhost"></figure> ipsum',

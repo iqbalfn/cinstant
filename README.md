@@ -24,7 +24,7 @@ $options = array(...);
 
 $content = new Cinstant($html, $options);
 
-echo $content;
+echo $content->article;
 ```
 
 Methods
@@ -62,7 +62,7 @@ $opts = array(...);
 
 $cinstant = new Cinstant($html, $opts);
 
-echo $cinstant;
+echo $cinstant->article;
 
 // #2
 
@@ -73,7 +73,7 @@ $cinstant->setOptions(...);
 
 $cinstant->convert();
 
-echo $cinstant;
+echo $cinstant->article;
 ```
 
 Properties
