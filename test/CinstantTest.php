@@ -15,6 +15,16 @@ class CinstantTest extends PHPUnit_Framework_TestCase
                 'lorem <figure><img src="http://localhost/media/image/1.png"></figure> ipsum',
                 array('localHost' => 'http://localhost')
             ),
+            'fill hostname to relative image path 2' => array(
+                'lorem <figure><img src="/../../media/image/1.png"></figure> ipsum',
+                'lorem <figure><img src="http://localhost/media/image/1.png"></figure> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
+            'fill hostname to relative image path 3' => array(
+                'lorem <figure><img src="../../media/image/1.png"></figure> ipsum',
+                'lorem <figure><img src="http://localhost/media/image/1.png"></figure> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
             'not fill hostname to relative image protocol' => array(
                 'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
                 'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
@@ -28,6 +38,11 @@ class CinstantTest extends PHPUnit_Framework_TestCase
             'convert parent and set figcaption if only #text in it' => array(
                 'lorem <p><img src="http://localhost">Im caption</p> ipsum',
                 'lorem <figure><img src="http://localhost"><figcaption>Im caption</figcaption></figure> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
+            'convert parent and ignore figcaption if only empty #text in it' => array(
+                'lorem <p><img src="http://localhost"> </p> ipsum',
+                'lorem <figure><img src="http://localhost"></figure> ipsum',
                 array('localHost' => 'http://localhost')
             ),
             'convert parent and set figcaption if only #text or inline html tag in it' => array(
