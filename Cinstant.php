@@ -155,7 +155,7 @@ class Cinstant
             if(substr($src,0,4) != 'http' && substr($src,0,2) != '//'){
                 $src = rtrim($this->localHost, '/') . '/' . ltrim($src, '/.');
                 $iframe->setAttribute('src', $src);
-            }elseif(preg_match('!facebook|instagram|twitter|vine|youtu!', $src)){
+            }elseif(preg_match('!^https?:\/\/[www\.]*(facebook|instagram|twitter|vine|youtu)!', $src)){
                 $parentClass = 'op-social';
             }
             
