@@ -25,10 +25,15 @@ class CinstantTest extends PHPUnit_Framework_TestCase
                 'lorem <figure><img src="http://localhost/media/image/1.png"></figure> ipsum',
                 array('localHost' => 'http://localhost')
             ),
-            'not fill hostname to relative image protocol' => array(
+            'should fill hostname to relative image protocol' => array(
                 'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
-                'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
+                'lorem <figure><img src="http://media.com/image/1.png"></figure> ipsum',
                 array('localHost' => 'http://localhost')
+            ),
+            'should fill hostname to relative image protocol with ssl' => array(
+                'lorem <figure><img src="//media.com/image/1.png"></figure> ipsum',
+                'lorem <figure><img src="https://media.com/image/1.png"></figure> ipsum',
+                array('localHost' => 'https://localhost')
             ),
             'convert parent to figure' => array(
                 'lorem <p><img src="http://localhost"></p> ipsum',
@@ -53,6 +58,11 @@ class CinstantTest extends PHPUnit_Framework_TestCase
             'create new parent' => array(
                 'lorem <div><img src="http://localhost"><section>lorem ipsum sit</section></div> ipsum',
                 'lorem <div><figure><img src="http://localhost"></figure><section>lorem ipsum sit</section></div> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
+            'create new parent if the first child of the parent is not me' => array(
+                '<div>lorem <img src="http://localhost"> lorem ipsum sit</div> ipsum',
+                '<div>lorem <figure><img src="http://localhost"></figure> lorem ipsum sit</div> ipsum',
                 array('localHost' => 'http://localhost')
             )
         );
@@ -94,12 +104,20 @@ class CinstantTest extends PHPUnit_Framework_TestCase
                 'lorem <div><iframe src="http://localhost"></iframe><section>lorem ipsum sit</section></div> ipsum',
                 'lorem <div><figure class="op-interactive"><iframe src="http://localhost"></iframe></figure><section>lorem ipsum sit</section></div> ipsum'
             ),
-            'use op-social instaed for youtube' => array(
+            'create new parent if the first parent is not me' => array(
+                '<div>lorem <iframe src="http://localhost"></iframe> lorem ipsum sit</div> ipsum',
+                '<div>lorem <figure class="op-interactive"><iframe src="http://localhost"></iframe></figure> lorem ipsum sit</div> ipsum'
+            ),
+            'use op-social instead for youtube' => array(
                 'lorem <div><iframe src="https://www.youtube.com/watch?v=es8lxbExFAQ"></iframe></div> ipsum',
                 'lorem <figure class="op-social"><iframe src="https://www.youtube.com/watch?v=es8lxbExFAQ"></iframe></figure> ipsum'
             ),
-            'use op-social instaed for vine' => array(
+            'use op-social instead for vine' => array(
                 'lorem <div><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></div> ipsum',
+                'lorem <figure class="op-social"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
+            ),
+            'add prefix for relative url protocol' => array(
+                'lorem <div><iframe src="//vine.co/v/iUPx0mwh9el/embed/simple"></iframe></div> ipsum',
                 'lorem <figure class="op-social"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
             )
         );
@@ -163,6 +181,39 @@ class CinstantTest extends PHPUnit_Framework_TestCase
       * @group div
       */
     public function testEmpty($html, $result, $options=array()){
+        $cins = new Cinstant($html, $options);
+        $this->assertEquals($result, $cins->article);
+    }
+    
+    /**************************************************************************
+     * anchor
+     **************************************************************************/
+     
+     public function anchorProvider(){
+        return array(
+            'add hostname on relative url' => array(
+                'lorem <a href="/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                'lorem <a href="http://localhost/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
+            'add protocol on relative protocol url' => array(
+                'lorem <a href="//hostname.com/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                'lorem <a href="http://hostname.com/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                array('localHost' => 'http://localhost')
+            ),
+            'add protocol on relative protocol url with ssl' => array(
+                'lorem <a href="//hostname.com/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                'lorem <a href="https://hostname.com/lorem/ipsum/sit/dolor/amet">what the fuck</a> ipsum',
+                array('localHost' => 'https://localhost')
+            )
+        );
+     }
+     
+     /**
+      * @dataProvider anchorProvider
+      * @group anchor
+      */
+    public function testAnchor($html, $result, $options=array()){
         $cins = new Cinstant($html, $options);
         $this->assertEquals($result, $cins->article);
     }

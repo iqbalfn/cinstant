@@ -39,6 +39,25 @@ class Cinstant
     }
     
     /**
+     * Predict protocol of url
+     * @param string url The url to predict
+     * @return string http(s)://
+     */
+    private function _fixUrl($url){
+        
+        if(substr($url, 0, 4) == 'http')
+            return $url;
+        
+        if(substr($url, 0, 2) == '//'){
+            if(preg_match('!facebook|instagram|twitter|vine|youtu!', $url))
+                return 'https://' . ltrim($url, './');
+            return rtrim(substr($this->localHost,0,5), '/:') . '://' . ltrim($url, './');
+        }
+        
+        return chop($this->localHost, './') . '/' . ltrim($url, './');
+    }
+    
+    /**
      * Convert img parent to be figure
      * @return $this
      */
@@ -78,6 +97,11 @@ class Cinstant
                 for($i=0; $i<$parentChildLength; $i++){
                     $maybe_caption = $parent->childNodes->item($i);
                     
+                    if(!$i && $maybe_caption != $element){
+                        $replaceParent = false;
+                        break;
+                    }
+                    
                     if(in_array($maybe_caption->nodeName, $inline_tags))
                         $figcaption_text[] = $maybe_caption;
                     elseif($maybe_caption->nodeName == $element->nodeName){
@@ -111,6 +135,30 @@ class Cinstant
     }
     
     /**
+     * Convert a tag 
+     * @return $this
+     */
+    private function _convertA(){
+        $as = $this->doc->getElementsByTagName('a');
+        if(!$as->length)
+            return $this;
+        
+        for($i=0; $i<$as->length; $i++){
+            $a = $as->item($i);
+            
+            // make the image to be absolute url
+            $href = $a->getAttribute('href');
+            if($href){
+                $new_href = $this->_fixUrl($href);
+                if($href != $new_href)
+                    $a->setAttribute('href', $new_href);
+            }
+        }
+        
+        return $this;
+    }
+    
+    /**
      * Convert img tag 
      * @return $this
      */
@@ -124,9 +172,10 @@ class Cinstant
             
             // make the image to be absolute url
             $src = $img->getAttribute('src');
-            if(substr($src,0,4) != 'http' && substr($src,0,2) != '//'){
-                $src = rtrim($this->localHost, '/') . '/' . ltrim($src, '/.');
-                $img->setAttribute('src', $src);
+            if($src){
+                $new_src = $this->_fixUrl($src);
+                if($src != $new_src)
+                    $img->setAttribute('src', $new_src);
             }
             
             // convert parent to figure
@@ -152,12 +201,14 @@ class Cinstant
             
             // make the image to be absolute url
             $src = $iframe->getAttribute('src');
-            if(substr($src,0,4) != 'http' && substr($src,0,2) != '//'){
-                $src = rtrim($this->localHost, '/') . '/' . ltrim($src, '/.');
-                $iframe->setAttribute('src', $src);
-            }elseif(preg_match('!facebook|instagram|twitter|vine|youtu!', $src)){
-                $parentClass = 'op-social';
+            if($src){
+                $new_src = $this->_fixUrl($src);
+                if($src != $new_src)
+                    $iframe->setAttribute('src', $new_src);
             }
+            
+            if(preg_match('!facebook|instagram|twitter|vine|youtu!', $src))
+                $parentClass = 'op-social';
             
             // convert parent to figure
             $this->_convertElParent($iframe, $parentClass);
@@ -220,6 +271,7 @@ class Cinstant
         $this
             ->_convertImg()
             ->_convertIframe()
+            ->_convertA()
             ->_convertDiv();
         
         $cimp = $this->doc->saveHTML();
