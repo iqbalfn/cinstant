@@ -119,6 +119,10 @@ class CinstantTest extends PHPUnit_Framework_TestCase
             'add prefix for relative url protocol' => array(
                 'lorem <div><iframe src="//vine.co/v/iUPx0mwh9el/embed/simple"></iframe></div> ipsum',
                 'lorem <figure class="op-social"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
+            ),
+            'use op-social correctly' => array(
+                'lorem <iframe src="https://www.vidio.com/embed/358824-ini-bukti-paris-hilton-komentari-foto-instagram-syahrini"></iframe> ipsum',
+                'lorem <figure class="op-interactive"><iframe src="https://www.vidio.com/embed/358824-ini-bukti-paris-hilton-komentari-foto-instagram-syahrini"></iframe></figure> ipsum'
             )
         );
      }

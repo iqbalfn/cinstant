@@ -205,9 +205,10 @@ class Cinstant
                 $new_src = $this->_fixUrl($src);
                 if($src != $new_src)
                     $iframe->setAttribute('src', $new_src);
+                $src = $new_src;
             }
             
-            if(preg_match('!facebook|instagram|twitter|vine|youtu!', $src))
+            if(preg_match('!^https?:\/\/[www\.]*(facebook|instagram|twitter|vine|youtu)!', $src))
                 $parentClass = 'op-social';
             
             // convert parent to figure
