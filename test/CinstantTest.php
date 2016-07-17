@@ -78,7 +78,7 @@ class CinstantTest extends PHPUnit_Framework_TestCase
     }
     
     /**************************************************************************
-     * Interactive | social
+     * Interactive
      **************************************************************************/
      
      public function iframeProvider(){
@@ -108,43 +108,34 @@ class CinstantTest extends PHPUnit_Framework_TestCase
                 '<div>lorem <iframe src="http://localhost"></iframe> lorem ipsum sit</div> ipsum',
                 '<div>lorem <figure class="op-interactive"><iframe src="http://localhost"></iframe></figure> lorem ipsum sit</div> ipsum'
             ),
-            'use op-social instead for youtube' => array(
+            'use op-interactive instead for youtube' => array(
                 'lorem <div><iframe src="https://www.youtube.com/watch?v=es8lxbExFAQ"></iframe></div> ipsum',
-                'lorem <figure class="op-social"><iframe src="https://www.youtube.com/watch?v=es8lxbExFAQ"></iframe></figure> ipsum'
+                'lorem <figure class="op-interactive"><iframe src="https://www.youtube.com/watch?v=es8lxbExFAQ"></iframe></figure> ipsum'
             ),
-            'use op-social instead for vine' => array(
+            'use op-interactive instead for vine' => array(
                 'lorem <div><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></div> ipsum',
-                'lorem <figure class="op-social"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
+                'lorem <figure class="op-interactive"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
             ),
             'add prefix for relative url protocol' => array(
                 'lorem <div><iframe src="//vine.co/v/iUPx0mwh9el/embed/simple"></iframe></div> ipsum',
-                'lorem <figure class="op-social"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
+                'lorem <figure class="op-interactive"><iframe src="https://vine.co/v/iUPx0mwh9el/embed/simple"></iframe></figure> ipsum'
             ),
-            'use op-social correctly' => array(
+            'use op-interactive correctly' => array(
                 'lorem <iframe src="https://www.vidio.com/embed/358824-ini-bukti-paris-hilton-komentari-foto-instagram-syahrini"></iframe> ipsum',
                 'lorem <figure class="op-interactive"><iframe src="https://www.vidio.com/embed/358824-ini-bukti-paris-hilton-komentari-foto-instagram-syahrini"></iframe></figure> ipsum'
             )
         );
      }
      
-     /**
-      * @dataProvider iframeProvider
-      * @group iframe
-      */
-    public function testIframe($html, $result, $options=array()){
-        $cins = new Cinstant($html, $options);
-        $this->assertEquals($result, $cins->article);
-    }
-    
     /**************************************************************************
-     * social
+     * interactive
      **************************************************************************/
      
      public function divProvider(){
         return array(
-            'make fb video to be op-social' => array(
+            'make fb video to be op-interactive' => array(
                 'lorem <div data-href="https://www.facebook.com/shanghaiist/videos/10154488047006030/" data-width="670" data-show-text="false" class="fb-video" data-allowfullscreen="true"></div> ipsum',
-                'lorem <figure class="op-social"><iframe><div data-href="https://www.facebook.com/shanghaiist/videos/10154488047006030/" data-width="670" data-show-text="false" class="fb-video" data-allowfullscreen="true"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script></iframe></figure> ipsum',
+                'lorem <figure class="op-interactive"><iframe><div data-href="https://www.facebook.com/shanghaiist/videos/10154488047006030/" data-width="670" data-show-text="false" class="fb-video" data-allowfullscreen="true"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script></iframe></figure> ipsum',
                 array('localHost' => 'http://localhost')
             )
         );
@@ -218,6 +209,55 @@ class CinstantTest extends PHPUnit_Framework_TestCase
       * @group anchor
       */
     public function testAnchor($html, $result, $options=array()){
+        $cins = new Cinstant($html, $options);
+        $this->assertEquals($result, $cins->article);
+    }
+    
+    
+    /**************************************************************************
+     * feedback
+     **************************************************************************/
+     
+     public function feedbackProvider(){
+        return array(
+            'set asset feedback to `fb:none` on `false`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:none"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => false)
+            ),
+            'set asset feedback to `fb:none` on `fb:none`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:none"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => 'fb:none')
+            ),
+            'set asset feedback to `fb:likes fb:comments` on `true`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:likes fb:comments"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => true)
+            ),
+            'set asset feedback to `fb:likes` on `fb:likes`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:likes"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => 'fb:likes')
+            ),
+            'set asset feedback to `fb:comments` on `fb:comments`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:comments"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => 'fb:comments')
+            ),
+            'set asset feedback to `fb:likes fb:comments` on `fb:likes fb:comments`' => array(
+                'lorem <img src="http://google.com/image.png"> ipsum',
+                'lorem <figure data-feedback="fb:likes fb:comments"><img src="http://google.com/image.png"></figure> ipsum',
+                array('assetFeedback' => 'fb:likes fb:comments')
+            )
+        );
+     }
+     
+     /**
+      * @dataProvider feedbackProvider
+      * @group feedback
+      */
+    public function testFeedback($html, $result, $options=array()){
         $cins = new Cinstant($html, $options);
         $this->assertEquals($result, $cins->article);
     }

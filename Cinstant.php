@@ -29,6 +29,12 @@ class Cinstant
     public $localHost = '';
     
     /**
+     * The assets feedback config
+     * @var mixed
+     */
+    public $assetFeedback = null;
+    
+    /**
      * Constructor
      * @param string html The HTML content.
      * @param array options List of options.
@@ -74,6 +80,14 @@ class Cinstant
         $figure = $this->doc->createElement('figure');
         if($figure_class)
             $figure->setAttribute('class', $figure_class);
+        
+        // add data-feedback if it's configured
+        if(!is_null($this->assetFeedback)
+        && in_array($element->tagName, array('img', 'video'))){
+            if(is_bool($this->assetFeedback))
+                $this->assetFeedback = $this->assetFeedback ? 'fb:likes fb:comments' : 'fb:none';
+            $figure->setAttribute('data-feedback', $this->assetFeedback);
+        }
         
         $replaceParent = true;
         $figcaption_text = [];
@@ -199,7 +213,7 @@ class Cinstant
             $iframe = $iframes->item($i);
             $parentClass = 'op-interactive';
             
-            // make the image to be absolute url
+            // make the target to be absolute url
             $src = $iframe->getAttribute('src');
             if($src){
                 $new_src = $this->_fixUrl($src);
@@ -207,9 +221,6 @@ class Cinstant
                     $iframe->setAttribute('src', $new_src);
                 $src = $new_src;
             }
-            
-            if(preg_match('!^https?:\/\/[www\.]*(facebook|instagram|twitter|vine|youtu)!', $src))
-                $parentClass = 'op-social';
             
             // convert parent to figure
             $this->_convertElParent($iframe, $parentClass);
@@ -244,7 +255,7 @@ class Cinstant
                 
                 $iframe->appendChild($script);
                 
-                $this->_convertElParent($iframe, 'op-social');
+                $this->_convertElParent($iframe, 'op-interactive');
             }
         }
         

@@ -108,6 +108,30 @@ $cins->setOptions('localHost', 'http://example.com/');
 // converted to `<img src="http://example.com/media/image.jpg">`
 ```
 
+### assetFeedback
+
+The status of assets feedback, it accept boolean `false` or string `fb:none` to 
+disable all feedback on asset. Otherwise it also accept value string `fb:likes`, 
+`fb:comments` or `fb:likes fb:comments` to enable any of them, or simply boolean
+`true` to enable all.
+
+```php
+
+$cins = new Cinstant;
+$cins->html = '<img src="/relative/path/to/image.jpg">';
+
+// the syntax like `<img src="http://example.com/media/image.jpg">`
+
+$cins->setOptions('assetFeedback', true);
+// converted to `<figure data-feedback="fb:likes fb:comments"><img src="http://example.com/media/image.jpg"></figure>`
+
+$cins->setOptions('assetFeedback', false);
+// converted to `<figure data-feedback="fb:none"><img src="http://example.com/media/image.jpg"></figure>`
+
+$cins->setOptions('assetFeedback', 'fb:likes');
+// converted to `<figure data-feedback="fb:likes"><img src="http://example.com/media/image.jpg"></figure>`
+```
+
 Dependencies
 ------------
 
@@ -123,10 +147,10 @@ don't you?
 Todo
 ----
 
-1. parent image with inline figcaption html tag.
-2. map
-3. slideshow
+2. [map](https://developers.facebook.com/docs/instant-articles/reference/map)
+3. [slideshow](https://developers.facebook.com/docs/instant-articles/reference/slideshow)
 4. video
+5. [figcaption position](https://developers.facebook.com/docs/instant-articles/reference/caption)
 
 Bug?
 ----
